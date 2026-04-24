@@ -1,26 +1,40 @@
-Stellar Survey is a high-fidelity, blockchain-integrated web application designed to demonstrate the power of immutable data anchoring using the Stellar Network. It transforms a standard survey experience into a secure, transparent, and premium digital journey.
+# Stellar Survey — Decentralized Future Insights
 
- Core Concept
-The application collects user insights on the decentralized future and ensures that every response is cryptographically protected. Instead of just saving data to a centralized database, the app generates a unique hash of the survey answers and "anchors" it permanently onto the Stellar Testnet. This provides a verifiable, time-stamped proof of participation that cannot be altered or deleted.
+A premium, blockchain-powered survey application built on the **Stellar Network**.
 
- Technical Implementation
-Blockchain Engine: Powered by the Stellar SDK.
-Automated Workflow:
-Generates a unique, ephemeral Stellar keypair for every submission.
-Automatically funds the account using the Stellar Friendbot.
-Calculates a cryptographic hash of the survey data.
-Broadcasts a transaction to the Horizon Testnet with the data hash stored in the Memo field.
-Verification: Upon successful submission, users are provided with a real Transaction Hash and a direct link to the Stellar Expert Explorer to view their data on the ledger.
- Design & Aesthetics
-Visual Style: A "Cyber-Slate" aesthetic featuring deep indigo backgrounds, electric cyan accents, and high-end glassmorphism.
-User Experience:
-Smooth multi-step form transitions.
-Dynamic particle background and ambient glow orbs for a "living" interface.
-Real-time progress indicators and live blockchain status messages.
-Typography: Clean and authoritative pairing of Inter for UI elements and Outfit for bold, editorial headings.
- Key Features
-Immutable Proof: Every survey response is anchored to a global blockchain ledger.
-Zero Barrier to Entry: No wallet or crypto knowledge required; the app handles all blockchain operations (funding and signing) seamlessly in the background.
-Speed & Finality: Leverages Stellar’s 3–5 second transaction finality for a responsive user experience.
-Responsive Design: Fully optimized for both desktop and mobile high-fidelity viewing.
-Stellar Survey represents the intersection of modern web design and decentralized trust, proving that blockchain can be both incredibly powerful and beautifully simple.
+## 🚀 Project Overview
+This project demonstrates a full-stack decentralized application (DApp) that uses Stellar for immutable data storage. It includes both a high-end React frontend and a **Soroban Smart Contract** for on-chain state management.
+
+## 📁 Project Structure
+- **/contract**: Contains the **Soroban Smart Contract** written in Rust.
+  - `src/lib.rs`: The core contract logic (voting, storage, authorization).
+  - `src/test.rs`: Comprehensive test suite for the contract.
+  - `Cargo.toml`: Build configuration for WASM deployment.
+- **/src**: The React frontend application.
+  - `stellar.js`: Integration logic using Stellar SDK and Horizon API.
+  - `App.jsx`: Premium UI with glassmorphism and animated components.
+  - `index.css`: Modern design system tokens and styles.
+
+## 💎 Key Features
+- **On-Chain Voting**: The smart contract ensures each address can only vote once per question and manages result counts on-ledger.
+- **Data Anchoring**: Supports Classic Stellar patterns (Memo-based anchoring) and Soroban Smart Contracts.
+- **Premium UI**: Ultra-dark mode aesthetic with cinematic animations and a responsive design.
+- **Stellar Testnet**: Integrated with the Horizon Testnet and Friendbot for a zero-cost, real-world demonstration.
+
+## 🛠️ How to Build
+### Smart Contract
+Requires Rust and the `soroban-cli`.
+```bash
+cd contract
+cargo test
+cargo build --target wasm32-unknown-unknown --release
+```
+
+### Frontend
+```bash
+npm install
+npm run dev
+```
+
+## 📜 License
+MIT
