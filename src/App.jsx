@@ -13,6 +13,7 @@ import {
   Lock,
   Zap,
   AlertCircle,
+  Coins
 } from 'lucide-react';
 import { submitSurveyToBlockchain } from './stellar';
 
@@ -31,12 +32,7 @@ const QUESTIONS = [
     id: 3,
     text: "Which Stellar use case excites you the most?",
     options: ["Cross-border Payments", "Tokenization of Assets", "DeFi Protocols", "Digital Identity"],
-  },
-  {
-    id: 4,
-    text: "Will blockchain replace traditional banking in the next decade?",
-    options: ["Yes, definitely", "Partially", "Unlikely", "No"],
-  },
+  }
 ];
 
 const STEP_INTRO = 0;
@@ -53,20 +49,6 @@ function App() {
   const [error, setError] = useState('');
   const [statusMsg, setStatusMsg] = useState('');
   const [selectedOption, setSelectedOption] = useState(null);
-  const [particles, setParticles] = useState([]);
-
-  // Animated background particles
-  useEffect(() => {
-    const pts = Array.from({ length: 20 }, (_, i) => ({
-      id: i,
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      size: Math.random() * 3 + 1,
-      duration: Math.random() * 15 + 10,
-      delay: Math.random() * -15,
-    }));
-    setParticles(pts);
-  }, []);
 
   const progress = ((currentQ + 1) / QUESTIONS.length) * 100;
 
@@ -88,10 +70,14 @@ function App() {
 
   const handleSubmit = async (finalAnswers) => {
     try {
-      setStatusMsg('Generating cryptographic keypair...');
-      await new Promise((r) => setTimeout(r, 500));
-      setStatusMsg('Funding ephemeral account via Stellar Friendbot...');
+      setStatusMsg('Connecting to Stellar Network...');
+      await new Promise(r => setTimeout(r, 500));
+      setStatusMsg('Anchoring survey hash to ledger...');
       const result = await submitSurveyToBlockchain(finalAnswers);
+      
+      setStatusMsg('Issuing SURVEY reward tokens...');
+      await new Promise(r => setTimeout(r, 800));
+      
       setTxDetails(result);
       setStep(STEP_SUCCESS);
     } catch (err) {
@@ -103,29 +89,10 @@ function App() {
 
   return (
     <div className="app-shell">
-      {/* Particle background */}
-      <div className="particles">
-        {particles.map((p) => (
-          <div
-            key={p.id}
-            className="particle"
-            style={{
-              left: `${p.x}%`,
-              top: `${p.y}%`,
-              width: `${p.size}px`,
-              height: `${p.size}px`,
-              animationDuration: `${p.duration}s`,
-              animationDelay: `${p.delay}s`,
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Glow orbs */}
+      <div className="particles"></div>
       <div className="orb orb-1" />
       <div className="orb orb-2" />
 
-      {/* Nav */}
       <nav className="navbar">
         <div className="nav-brand">
           <Database size={20} />
@@ -137,68 +104,39 @@ function App() {
         </div>
       </nav>
 
-      {/* Main */}
       <main className="main-content">
-
-        {/* ── INTRO ── */}
         {step === STEP_INTRO && (
           <div className="fade-in section-intro">
             <div className="hero-icon-wrap">
               <div className="hero-glow" />
               <Globe size={96} className="hero-icon" />
             </div>
-
             <h1 className="hero-title">Decentralized Future<br />Insights</h1>
             <p className="hero-sub">
-              Participate in the global consensus. Your responses are cryptographically hashed
-              and permanently anchored on the <span className="highlight">Stellar Blockchain</span> via a real Testnet transaction.
+              Participate in the global consensus. Your responses are anchored on Stellar, and you will receive <span className="highlight">SURVEY tokens</span> as a reward for your participation.
             </p>
-
-            <button id="start-survey-btn" className="btn-primary pulse-animation" onClick={() => setStep(STEP_SURVEY)}>
+            <button className="btn-primary pulse-animation" onClick={() => setStep(STEP_SURVEY)}>
               Start Survey <Send size={18} />
             </button>
-
             <div className="trust-badges">
-              <div className="badge"><Lock size={14} /> Data Hashed</div>
-              <div className="badge"><ShieldCheck size={14} /> Stellar Testnet</div>
-              <div className="badge"><Zap size={14} /> 3–5 Second Finality</div>
-            </div>
-
-            <div className="stats-grid">
-              <div className="stat-card glass-card">
-                <div className="stat-value">12.4K</div>
-                <div className="stat-label"><Users size={13} /> Submissions</div>
-              </div>
-              <div className="stat-card glass-card">
-                <div className="stat-value">4s</div>
-                <div className="stat-label"><Zap size={13} /> Avg Finality</div>
-              </div>
-              <div className="stat-card glass-card">
-                <div className="stat-value">100%</div>
-                <div className="stat-label"><BarChart3 size={13} /> Immutable</div>
-              </div>
+              <div className="badge"><Lock size={14} /> Soroban Optimized</div>
+              <div className="badge"><Coins size={14} /> Token Rewards</div>
+              <div className="badge"><ShieldCheck size={14} /> Immutable Audit</div>
             </div>
           </div>
         )}
 
-        {/* ── SURVEY ── */}
         {step === STEP_SURVEY && (
           <div className="fade-in glass-card survey-card">
             <div className="progress-bar-container">
               <div className="progress-bar-fill" style={{ width: `${progress}%` }} />
             </div>
-
-            <span className="q-meta">
-              Question {currentQ + 1} <span className="q-divider">of</span> {QUESTIONS.length}
-            </span>
-
+            <span className="q-meta">Question {currentQ + 1} of {QUESTIONS.length}</span>
             <h2 className="q-text">{QUESTIONS[currentQ].text}</h2>
-
             <div className="options-list">
               {QUESTIONS[currentQ].options.map((opt) => (
                 <button
                   key={opt}
-                  id={`option-${opt.replace(/\s+/g, '-').toLowerCase()}`}
                   className={`survey-option ${selectedOption === opt ? 'selected' : ''}`}
                   onClick={() => handleOptionSelect(opt)}
                 >
@@ -210,35 +148,24 @@ function App() {
           </div>
         )}
 
-        {/* ── SUBMITTING ── */}
         {step === STEP_SUBMITTING && (
           <div className="fade-in text-center submitting-section">
             <div className="spinner-wrap">
               <div className="spinner" />
               <div className="spinner-inner" />
             </div>
-            <h2 className="submitting-title">Anchoring to Stellar...</h2>
-            <p className="submitting-status">{statusMsg || 'Connecting to Horizon Testnet...'}</p>
-            <div className="submitting-steps">
-              <div className="sub-step">🔑 Ephemeral keypair generated</div>
-              <div className="sub-step">💧 Funded via Friendbot</div>
-              <div className="sub-step">📡 Broadcasting transaction</div>
-              <div className="sub-step">✅ Awaiting ledger confirmation</div>
-            </div>
+            <h2 className="submitting-title">Stellar Processing...</h2>
+            <p className="submitting-status">{statusMsg}</p>
           </div>
         )}
 
-        {/* ── SUCCESS ── */}
         {step === STEP_SUCCESS && txDetails && (
           <div className="fade-in glass-card success-card">
             <div className="success-icon-wrap">
               <CheckCircle size={72} className="success-icon" />
             </div>
-
-            <h2 className="success-title">Submission Immutable</h2>
-            <p className="success-sub">
-              Your survey has been permanently anchored to the Stellar Testnet ledger.
-            </p>
+            <h2 className="success-title">Insights Anchored</h2>
+            <p className="success-sub">Transaction confirmed on the Stellar Network.</p>
 
             <div className="tx-details">
               <div className="tx-row">
@@ -246,16 +173,8 @@ function App() {
                 <span className="tx-val tx-hash">{txDetails.hash}</span>
               </div>
               <div className="tx-row">
-                <span className="tx-label">LEDGER</span>
-                <span className="tx-val">{txDetails.ledger}</span>
-              </div>
-              <div className="tx-row">
-                <span className="tx-label">DATA HASH</span>
-                <span className="tx-val">{txDetails.dataHash}</span>
-              </div>
-              <div className="tx-row">
-                <span className="tx-label">TIMESTAMP</span>
-                <span className="tx-val">{new Date(txDetails.timestamp).toLocaleString()}</span>
+                <span className="tx-label">REWARD</span>
+                <span className="tx-val text-primary font-bold">1.0 {txDetails.reward?.assetCode} Minted</span>
               </div>
               <div className="tx-row">
                 <span className="tx-label">NETWORK</span>
@@ -268,37 +187,28 @@ function App() {
               target="_blank"
               rel="noopener noreferrer"
               className="btn-explorer"
-              id="view-on-explorer-btn"
             >
               View on Stellar Expert <ExternalLink size={16} />
             </a>
 
             <div className="verified-badge">
-              <ShieldCheck size={16} /> VERIFIED BY STELLAR NETWORK
+              <ShieldCheck size={16} /> VERIFIED BY STELLAR CONSENSUS
             </div>
-
-            <button className="btn-ghost" onClick={() => { setStep(STEP_INTRO); setAnswers({}); setCurrentQ(0); }}>
-              Take Survey Again
-            </button>
           </div>
         )}
 
-        {/* ── ERROR ── */}
         {step === STEP_ERROR && (
           <div className="fade-in glass-card error-card">
             <AlertCircle size={64} className="error-icon" />
-            <h2 className="error-title">Blockchain Error</h2>
+            <h2 className="error-title">Submission Error</h2>
             <p className="error-msg">{error}</p>
-            <button className="btn-primary" onClick={() => { setStep(STEP_INTRO); setAnswers({}); setCurrentQ(0); }}>
-              Try Again
-            </button>
+            <button className="btn-primary" onClick={() => setStep(STEP_INTRO)}>Try Again</button>
           </div>
         )}
-
       </main>
 
       <footer className="footer">
-        <p>Built with <span className="highlight">Stellar SDK</span> · Data anchored on Stellar Testnet · &copy; 2026</p>
+        <p>Built with <span className="highlight">Stellar SDK & Soroban</span> · &copy; 2026</p>
       </footer>
     </div>
   );
